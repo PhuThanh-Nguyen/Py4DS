@@ -23,7 +23,7 @@ def randomForestModel(X_train,X_test,y_train,y_test):
     y_pred = clf.predict(X_test)
     return metrics.accuracy_score(y_pred,y_test)
 def main():
-    data_path = '/home/duc-hoang/Documents/Junior-Year/Python-For-Data-Science/Lab-01/Py4DS-Lab01/dataset/diabetes.csv'
+    data_path = '../dataset/diabetes.csv'
     col_names = ['pregnant', 'glucose','bp','skin','isulin','bmi','pedigree','age','label']
     df = pd.read_csv(data_path,header=0, names=col_names)
     # Feature selection
