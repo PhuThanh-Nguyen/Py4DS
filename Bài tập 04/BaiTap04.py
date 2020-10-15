@@ -8,8 +8,8 @@ from sklearn import metrics
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 
-def decisionTreeModel(X_train,X_test,y_train,y_test):
-    mdl = DecisionTreeClassifier()
+def decisionTreeModel(X_train,X_test,y_train,y_test, maxdepth):
+    mdl = DecisionTreeClassifier(max_depth=maxdepth)
     mdl.fit(X_train, y_train)
     y_pred = mdl.predict(X_test)
     return metrics.accuracy_score(y_pred,y_test)
@@ -42,14 +42,23 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
     # Build model
-    decisionTreeAccuracy = decisionTreeModel(X_train,X_test,y_train,y_test)
-    print(f'CART (Tree prediction) Accuracy = {decisionTreeAccuracy}')
+    # Decision Tree model
+    # compare accuracy with differing values of max_depth
+    # for max_depth in [50, 500, 5000, 50000]:
+    #     my_mae = decisionTreeModel(X_train, X_test, y_train, y_test,max_depth)
+    #     print("Max depth: %d  \t\t Decision Tree accuracy:  %f" %(max_depth, my_mae))
 
+    decisionTreeAccuracy = decisionTreeModel(X_train,X_test,y_train,y_test,500) # take max_depth = 500
+    print(f'Decision Tree prediction Accuracy = {decisionTreeAccuracy}')
+
+    # Random Forest model
     randomForestAccuracy = randomForestModel(X_train,X_test,y_train,y_test)
     print(f'Random Forest prediction Accuracy = {randomForestAccuracy}')
 
+    # SVM model
     svcAccuracy = supportVectorMachine(X_train,X_test,y_train,y_test)
     print(f'SVM prediction Accuracy = {svcAccuracy}')
+    
 
 if __name__ == '__main__':
     main()
