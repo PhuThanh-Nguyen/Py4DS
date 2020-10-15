@@ -25,7 +25,7 @@ def supportVectorMachine(X_train,X_test,y_train,y_test):
     return metrics.accuracy_score(y_pred,y_test)
 def main():
 
-    data_path = '../xAPI-Edu-Data.csv'
+    data_path = '../dataset/xAPI-Edu-Data.csv'
     data = pd.read_csv(data_path)
 
     # Feature selection
