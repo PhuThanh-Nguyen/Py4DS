@@ -1,4 +1,3 @@
-# Add code here
 import pandas as pd 
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
@@ -24,7 +23,7 @@ def randomForestModel(X_train,X_test,y_train,y_test):
     y_pred = clf.predict(X_test)
     return metrics.accuracy_score(y_pred,y_test)
 def main():
-    data_path = '/home/duc-hoang/Documents/Junior-Year/Python-For-Data-Science/Py4DS_Lab1/Py4DS_Lab1_Dataset/diabetes.csv'
+    data_path = '../dataset/diabetes.csv'
     col_names = ['pregnant', 'glucose','bp','skin','isulin','bmi','pedigree','age','label']
     df = pd.read_csv(data_path,header=0, names=col_names)
     # Feature selection
@@ -38,10 +37,10 @@ def main():
     print(f'CART (Tree prediction) Accuracy = {decisionTreeAccuracy}')
 
     randomForestAccuracy = randomForestModel(X_train,X_test,y_train,y_test)
-    print(f'CART (RF prediction) Accuracy = {randomForestAccuracy}')
+    print(f'Random Forest prediction Accuracy = {randomForestAccuracy}')
 
     svcAccuracy = supportVectorMachine(X_train,X_test,y_train,y_test)
-    print(f'CART (svm prediction) Accuracy = {svcAccuracy}')
+    print(f'SVM prediction Accuracy = {svcAccuracy}')
 
 
 if __name__ == '__main__':
