@@ -4,8 +4,6 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-# import eli5
-# from eli5.sklearn import PermutationImportance
 
 def decisionTreeModel(max_depth, X_train,X_test,y_train,y_test):
     clf = DecisionTreeClassifier(max_depth=max_depth)
@@ -47,10 +45,9 @@ def main():
     randomForestAccuracy = randomForestModel(X_train,X_test,y_train,y_test)
     print(f'Random Forest prediction Accuracy = {randomForestAccuracy}')
 
+    # Support Vector Machine
     svcAccuracy = supportVectorMachine(X_train,X_test,y_train,y_test)
     print(f'SVM prediction Accuracy = {svcAccuracy}')
     
 if __name__ == '__main__':
     main()
-
-
