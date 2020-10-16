@@ -1,39 +1,44 @@
-# Add code here
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn import preprocessing
-from sklearn import metrics
+from sklearn import preprocessing, metrics
 from sklearn.svm import SVC
 from sklearn.linear_model import SGDClassifier, LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import MultinomialNB
 
 def decisionTreeModel(X_train,X_test,y_train,y_test, maxdepth):
     mdl = DecisionTreeClassifier(max_depth=maxdepth)
     mdl.fit(X_train, y_train)
     y_pred = mdl.predict(X_test)
-    return metrics.accuracy_score(y_pred,y_test)
+    return metrics.accuracy_score(y_test, y_pred)
+
 def randomForestModel(X_train,X_test,y_train,y_test):
     mdl = RandomForestClassifier()
     mdl.fit(X_train, y_train)
     y_pred = mdl.predict(X_test)
-    return metrics.accuracy_score(y_pred,y_test)
+    return metrics.accuracy_score(y_test, y_pred)
+
 def supportVectorMachine(X_train,X_test,y_train,y_test):
     mdl = SVC(kernel='poly')
     mdl.fit(X_train,y_train)
     y_pred = mdl.predict(X_test)
-    return metrics.accuracy_score(y_pred,y_test)
+    return metrics.accuracy_score(y_test, y_pred)
+
 def sgdModel(X_train,X_test,y_train,y_test):
     mdl = SGDClassifier()
     mdl.fit(X_train,y_train)
     y_pred = mdl.predict(X_test)
-    return metrics.accuracy_score(y_pred,y_test)
+    return metrics.accuracy_score(y_test, y_pred)
+
 def LR_Model(X_train,X_test,y_train,y_test):
     mdl = LogisticRegression()
     mdl.fit(X_train,y_train)
     y_pred = mdl.predict(X_test)
-    return metrics.accuracy_score(y_pred,y_test)
+    return metrics.accuracy_score(y_test, y_pred)
+
 def main():
 
     data_path = '../dataset/xAPI-Edu-Data.csv'
@@ -46,8 +51,7 @@ def main():
 
     # Label Encoder
     enc = preprocessing.LabelEncoder()
-    label_encoded = enc.fit_transform(y)
-    y = label_encoded
+    y = enc.fit_transform(y)
 
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
@@ -72,11 +76,12 @@ def main():
     print(f'SVM prediction Accuracy = {svcAccuracy}')
     
     # SGD model
-    sgdAccuracy = SGDClassifier(X_train,X_test,y_train,y_test)
+    sgdAccuracy = sgdModel(X_train,X_test,y_train,y_test)
     print(f'SGD prediction Accuracy = {sgdAccuracy}')
 
     # Linear Regression model
     lrAccuracy = LR_Model(X_train,X_test,y_train,y_test)
-    print(f'SGD prediction Accuracy = {lrAccuracy}')
+    print(f'Linear Regression prediction Accuracy = {lrAccuracy}')
+    
 if __name__ == '__main__':
     main()
