@@ -29,7 +29,7 @@ def sgdModel(X_train,X_test,y_train,y_test):
     mdl.fit(X_train,y_train)
     y_pred = mdl.predict(X_test)
     return metrics.accuracy_score(y_pred,y_test)
-def LogisticRegression(X_train,X_test,y_train,y_test):
+def LR_Model(X_train,X_test,y_train,y_test):
     mdl = LogisticRegression()
     mdl.fit(X_train,y_train)
     y_pred = mdl.predict(X_test)
@@ -76,7 +76,7 @@ def main():
     print(f'SGD prediction Accuracy = {sgdAccuracy}')
 
     # Linear Regression model
-    lrAccuracy = LogisticRegression(X_train,X_test,y_train,y_test)
+    lrAccuracy = LR_Model(X_train,X_test,y_train,y_test)
     print(f'SGD prediction Accuracy = {lrAccuracy}')
 if __name__ == '__main__':
     main()
