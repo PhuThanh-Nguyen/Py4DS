@@ -54,7 +54,7 @@ def main():
     # Bernoulli Naive Bayes
     bernoulliAccuracy = naiveBayesBernoulli(X_train, X_test, y_train, y_test)
     print(f'Bernoulli Naive Bayes Accuracy = {bernoulliAccuracy}')
-    #
+    # KNN Model
     knnAccuracy = KNNModel(X_train, X_test, y_train, y_test)
     print(f'KNN Accuracy = {knnAccuracy}')
 
