@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 def main():
-    df = pd.read_csv("/home/duc-hoang/Documents/Junior-Year/Py4DS/Py4DS/Lab 02/dataset/xAPI-Edu-Data.csv")
+    df = pd.read_csv("../dataset/xAPI-Edu-Data.csv")
     df.rename(index=str, columns={'gender':'Gender',
                                 'NationalITy': 'Nationality',
                                 'raisedhands': 'RaisedHands',
