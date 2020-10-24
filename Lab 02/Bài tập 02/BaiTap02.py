@@ -40,10 +40,11 @@ def main():
 	'''
 	Nhận xét biểu đồ:
 	+) Đa số học sinh giỏi, trung bình nghỉ dưới 7 ngày
-	+) Đa số học sinh yếu nghỉ trên 7 ngày
+	+) Đa số học sinh yếu và trung bình nghỉ trên 7 ngày, số lượng học sinh yếu nhiều hơn so với số lượng học sinh trung bình
 	'''
 	sns.countplot(x = 'StudentAbsenceDays', hue = 'Class', data = data)
 	plt.show()
 	"""==========================================================================="""
+
 if __name__ == '__main__':
 	main()
