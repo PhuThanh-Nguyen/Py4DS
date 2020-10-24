@@ -4,7 +4,8 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 
 def main():
-    data = pd.read_csv('/home/duc-hoang/Documents/Junior-Year/Py4DS/Py4DS/Lab 02/dataset/creditcard.csv')
+    # Download dataset and locate path.
+    data = pd.read_csv('../dataset/creditcard.csv')
 
     data.Class.value_counts()
     #================================================================================
@@ -16,7 +17,7 @@ def main():
     plt.show()
     #================================================================================
     """
-    Nhìn vào đồ thị ta thấy được sự dữ liệu có xu hướng "unbalance" giữa các class.
+    Nhìn vào đồ thị ta thấy được dữ liệu có xu hướng "unbalance" giữa các class.
     """
     #================================================================================
     avg_amount = data.groupby("Class")[['Amount']].agg("mean").reset_index()
