@@ -31,5 +31,22 @@ def main():
 	ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
 	plt.show()
 	"""==========================================================================="""
+	print(data[['Healthy life expectancy', 'Social support']].corr())
+	'''
+	Nhận xét: Hệ số tương quan của tình trạng sức khỏe và sự hỗ trợ từ gia đình là khoảng 0.75, thể hiện sự phụ thuộc tuyến tính tăng khá 		mạnh giữa hai đặc trưng này -> Gia đình càng gắn bó thì sức khỏe của thành viên cũng tốt hơn
+	Biểu đồ dưới thể hiện mối quan hệ này
+	'''
+	sns.regplot(x = 'Healthy life expectancy', y = 'Social support', data = data)
+	plt.show()
+	"""==========================================================================="""
+	print(data[['Logged GDP per capita', 'Healthy life expectancy']].corr())
+	'''
+	Nhận xét: Hệ số tương quan của tình trạng sức khỏe và GDP của quốc gia là khoảng 0.85, thể hiện sự phụ thuộc tuyến tính tăng khá 		mạnh giữa hai đặc trưng này -> Quốc gia càng phát triển về kinh tế thì người dân được chăm sóc sức khỏe tốt hơn
+	Biểu đồ dưới thể hiện mối quan hệ này
+	'''
+	sns.regplot(x = 'Logged GDP per capita', y = 'Healthy life expectancy', data = data)
+	plt.show()
+	"""==========================================================================="""
+
 if __name__ == '__main__':
 	main()
