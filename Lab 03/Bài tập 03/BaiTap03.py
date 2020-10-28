@@ -23,10 +23,10 @@ def main():
     print(data.info())
     print(data.describe())
 
-    # impute zeros to columns have to much missing values
+    # Drop 2 unnecessary columns 
     missing_cols = ['Own goals', 'Own goal Time']
     data = data.drop(missing_cols,axis=1)
-    # drop missing values by rows
+    # Drop missing values by rows
     data = data.dropna(axis=0)
     print('>> After dropping missing values')
     print(f'>> data shape: {data.shape}')
@@ -59,7 +59,7 @@ def main():
     IQR = Q3 - Q1
     print(IQR)
 
-    # box plot each columns to determine the outlier values
+    # Box plot each columns to determine the outlier values
     boxplot = data[[col for col in data.columns]]
     f, ax = plt.subplots(ncols = 4, nrows = 6, figsize=(10,len(boxplot.columns)/3))
     for i, c in zip(ax.flatten(), boxplot.columns):
@@ -86,9 +86,9 @@ def main():
     X_test_standardScaler = scalerX.transform(X_test)
 	
     accuracy = randomForestModel(X_train_standardScaler, X_test_standardScaler, y_train, y_test)
-    print(f'Decision Tree model accuracy using Standard Scaler: {accuracy}')
+    print(f'Random Forest model accuracy using Standard Scaler: {accuracy}')
 	
-	# Using Robust Scaler
+    # Using Robust Scaler
     scalerX = RobustScaler()
     scalerX.fit(X_train)
     X_train_standardScaler = scalerX.transform(X_train)
@@ -97,9 +97,9 @@ def main():
     X_test_standardScaler = scalerX.transform(X_test)
 	
     accuracy = randomForestModel(X_train_standardScaler, X_test_standardScaler, y_train, y_test)
-    print(f'Decision Tree model accuracy using Robust Scaler: {accuracy}')
+    print(f'Random Forest model accuracy using Robust Scaler: {accuracy}')
 	
-	# Using Normalizer
+    # Using Normalizer
     scalerX = Normalizer()
     scalerX.fit(X_train)
     X_train_standardScaler = scalerX.transform(X_train)
@@ -108,6 +108,6 @@ def main():
     X_test_standardScaler = scalerX.transform(X_test)
 	
     accuracy = randomForestModel(X_train_standardScaler, X_test_standardScaler, y_train, y_test)
-    print(f'Decision Tree model accuracy using Normalizer: {accuracy}')
+    print(f'Random Forest model accuracy using Normalizer: {accuracy}')
 if __name__ == "__main__":
     main()
