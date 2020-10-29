@@ -34,14 +34,6 @@ def main():
 	Amount.set(ylim=(data['Amount'].min(),300))
 	plt.show()
 
-	X = data.drop(['Class'], axis = 'columns')
-	y = data['Class']
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 1)
-	
-	# Before normalize
-	accuracy = decisionTreeModel(X_train, X_test, y_train, y_test)
-	print(f'Decision Tree model accuracy before normalization: {accuracy}')
-
 	print('>> Before drop missing values: ')
 	print(f'>> Data shape: {data.shape}')
 	print(data.info())
@@ -61,6 +53,14 @@ def main():
 	print(f'>> Data shape: {data.shape}')
 	print(data.info())
 	print(data.describe())
+	
+	X = data.drop(['Class'], axis = 'columns')
+	y = data['Class']
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 1)
+	
+	# Before normalize
+	accuracy = decisionTreeModel(X_train, X_test, y_train, y_test)
+	print(f'Decision Tree model accuracy before normalization: {accuracy}')
 	
 	# Using Standard Scaler
 	scalerX = StandardScaler()
@@ -96,10 +96,10 @@ def main():
 	print(f'Decision Tree model accuracy using Normalizer: {accuracy}')
 	'''
 	With random_state == 1:
-		Decision Tree model accuracy before normalization: 0.9990730597455127
-		Decision Tree model accuracy using Standard Scaler: 0.9989607033510295
-		Decision Tree model accuracy using Robust Scaler: 0.9990730597455127
-		Decision Tree model accuracy using Normalizer: 0.9987640796606837
+		Decision Tree model accuracy before normalization: 0.9990131393447246
+		Decision Tree model accuracy using Standard Scaler: 0.9991964134664185
+		Decision Tree model accuracy using Robust Scaler: 0.9990695313821688
+		Decision Tree model accuracy using Normalizer: 0.9986042970732533
 	'''
 if __name__ == '__main__':
 	main()
