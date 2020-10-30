@@ -13,7 +13,10 @@ def decisionTreeModel(X_train, X_test, y_train, y_test):
 	return metrics.accuracy_score(y_test, y_pred)
 
 def main():
+	# Read data
 	data = pd.read_csv('../dataset/creditcard.csv')
+	
+	# EDA
 	
 	for i in range(len(data.columns)):
 		print(data.iloc[:,i].value_counts())
@@ -33,27 +36,52 @@ def main():
 	Amount = sns.boxplot(x="Class", y="Amount", data=data)
 	Amount.set(ylim=(data['Amount'].min(),300))
 	plt.show()
-
+	
+	# Remove missing values, duplicates and outliers
+	# Remove missing values:
 	print('>> Before drop missing values: ')
 	print(f'>> Data shape: {data.shape}')
 	print(data.info())
 	print(data.describe())
 	data = data.dropna()
+	
 	print('>> After drop missing values:')
 	print(f'>> Data shape: {data.shape}')
 	print(data.info())
 	print(data.describe())
 	
+	# Remove duplicate values
 	print('>> Before drop duplicate values: ')
 	print(f'>> Data shape: {data.shape}')
 	print(data.info())
 	print(data.describe())
+	
 	data.drop_duplicates(subset = data.columns.values[:-1], keep = 'first', inplace = True)
 	print('>> After drop duplicate values:')
 	print(f'>> Data shape: {data.shape}')
 	print(data.info())
 	print(data.describe())
 	
+	# Remove outliers
+	low = 0.25
+	high = 0.75
+	quantiles = data.quantile([low, high])
+	
+	print('>> Before drop outliers: ')
+	print(f'>> Data shape: {data.shape}')
+	print(data.info())
+	print(data.describe())
+	
+	data = data.apply(lambda x: x[(x >= 2.5 * quantiles.loc[low, x.name] - 1.5 * quantiles.loc[high, x.name]) \
+							& (x <= 2.5 * quantiles.loc[high, x.name] - 1.5 * quantiles.loc[low, x.name])], axis=0)
+	data.dropna(inplace=True)
+	
+	print('>> After drop outliers: ')
+	print(f'>> Data shape: {data.shape}')
+	print(data.info())
+	print(data.describe())
+	
+	# Train model with differents normalizer
 	X = data.drop(['Class'], axis = 'columns')
 	y = data['Class']
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 1)
@@ -96,10 +124,10 @@ def main():
 	print(f'Decision Tree model accuracy using Normalizer: {accuracy}')
 	'''
 	With random_state == 1:
-		Decision Tree model accuracy before normalization: 0.9990131393447246
-		Decision Tree model accuracy using Standard Scaler: 0.9991964134664185
-		Decision Tree model accuracy using Robust Scaler: 0.9990695313821688
-		Decision Tree model accuracy using Normalizer: 0.9986042970732533
+		Decision Tree model accuracy before normalization: 1.0
+		Decision Tree model accuracy using Standard Scaler: 1.0
+		Decision Tree model accuracy using Robust Scaler: 1.0
+		Decision Tree model accuracy using Normalizer: 1.0
 	'''
 if __name__ == '__main__':
 	main()
