@@ -63,18 +63,16 @@ def main():
 	print(data.describe())
 	
 	# Remove outliers
-	low = 0.25
-	high = 0.75
-	quantiles = data.quantile([low, high])
+	Q1 = data.quantile(0.25)
+	Q3 = data.quantile(0.75)
+	IQR = Q3 - Q1
 	
 	print('>> Before drop outliers: ')
 	print(f'>> Data shape: {data.shape}')
 	print(data.info())
 	print(data.describe())
 	
-	data = data.apply(lambda x: x[(x >= 2.5 * quantiles.loc[low, x.name] - 1.5 * quantiles.loc[high, x.name]) \
-							& (x <= 2.5 * quantiles.loc[high, x.name] - 1.5 * quantiles.loc[low, x.name])], axis=0)
-	data.dropna(inplace=True)
+	data = data[~((data < (Q1 - 1.5 * IQR)) |(data > (Q3 + 1.5 * IQR))).any(axis=1)]
 	
 	print('>> After drop outliers: ')
 	print(f'>> Data shape: {data.shape}')
