@@ -16,7 +16,7 @@ def rfModel(X_train, X_test, y_train, y_test):
 	return metrics.accuracy_score(y_test, y_pred)
 
 def main():
-    path = '/home/duc-hoang/Documents/Junior-Year/Py4DS/LAB/Lab 03/dataset/FIFA2018Statistics.csv'
+    path = '../dataset/FIFA2018Statistics.csv'
     data = pd.read_csv(path)
     print('>> Original data infomation')
     print(f'>> data shape: {data.shape}')
@@ -69,18 +69,18 @@ def main():
     for i, c in zip(ax.flatten(), data.columns):
         sns.boxplot(data[c], ax = i)
     f.tight_layout()
-    plt.title('Before removing outliers')
+    plt.title('>> Before removing outliers')
     plt.show()
 
     # remove outliers
     data = data[~((data < (Q1 - 1.5 * IQR)) | (data > (Q3 + 1.5 * IQR))).any(axis=1)]
-    print(f'data shape after removing outliers: {data.shape}')
+    print(f'>> data shape after removing outliers: {data.shape}')
 
     f, ax = plt.subplots(ncols = 4, nrows = 5, figsize=(15,len(data.columns)/2))
     for i, c in zip(ax.flatten(), data.columns):
         sns.boxplot(data[c], ax = i)
     f.tight_layout()
-    plt.title('After removing outliers')
+    plt.title('>> After removing outliers')
     plt.show()
 
     cleaned_data = pd.get_dummies(data)
@@ -90,7 +90,7 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 1)
 
     accuracy = rfModel(X_train, X_test, y_train, y_test)
-    print(f'Random Forest Accuracy before normalizing {accuracy}')
+    print(f'>> Random Forest Accuracy before normalizing {accuracy}')
 
     # Using Standard Scaler
     scalerX = StandardScaler()
@@ -101,7 +101,7 @@ def main():
     X_test_standardScaler = scalerX.transform(X_test)
 	
     accuracy = rfModel(X_train_standardScaler, X_test_standardScaler, y_train, y_test)
-    print(f'Random Forest model accuracy using Standard Scaler: {accuracy}')
+    print(f'>> Random Forest model accuracy using Standard Scaler: {accuracy}')
 	
     # Using Robust Scaler
     scalerX = RobustScaler()
@@ -112,7 +112,7 @@ def main():
     X_test_standardScaler = scalerX.transform(X_test)
 	
     accuracy = rfModel(X_train_standardScaler, X_test_standardScaler, y_train, y_test)
-    print(f'Random Forest model accuracy using Robust Scaler: {accuracy}')
+    print(f'>> Random Forest model accuracy using Robust Scaler: {accuracy}')
 	
     # Using Normalizer
     scalerX = Normalizer()
@@ -123,7 +123,7 @@ def main():
     X_test_standardScaler = scalerX.transform(X_test)
 	
     accuracy = rfModel(X_train_standardScaler, X_test_standardScaler, y_train, y_test)
-    print(f'Random Forest model accuracy using Normalizer: {accuracy}')
+    print(f'>> Random Forest model accuracy using Normalizer: {accuracy}')
     """
     Random Forest Accuracy before normalizing 0.6842105263157895
     Random Forest model accuracy using Standard Scaler: 0.7894736842105263
