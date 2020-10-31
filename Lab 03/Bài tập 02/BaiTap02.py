@@ -13,23 +13,31 @@ def LinearRegression_Model(X_train,X_test,y_train,y_test):
 	clf = LinearRegression()
 	clf.fit(X_train,y_train)
 	y_pred = clf.predict(X_test)
-	return (np.sqrt(metrics.mean_squared_error(y_test, y_pred)),r2_score(y_test,y_pred) * 100,mean_absolute_error(y_test,y_pred),mean_squared_error(y_test,y_pred))
+	return (
+		np.sqrt(metrics.mean_squared_error(y_test,y_pred)),
+		r2_score(y_test,y_pred)*100,
+		mean_absolute_error(y_test,y_pred),
+		mean_squared_error(y_test,y_pred)
+	)
 
 def main():
-	nyc_df = pd.read_csv('/home/duc-hoang/Documents/Junior-Year/Py4DS/LAB/Lab 03/dataset/AB_NYC_2019.csv')
-	# print('>> Before drop duplicate values: ')
-	# print(f'>> nyc_df shape: {nyc_df.shape}')
-	# print(nyc_df.info())
-	# print(nyc_df.describe())
-	# print('>> After drop duplicate values:')
-	# print(f'>> nyc_df shape: {nyc_df.shape}')
-	# print(nyc_df.info())
-	# print(nyc_df.describe())
+	nyc_df = pd.read_csv('../dataset/AB_NYC_2019.csv')
+	
+	# Drop duplicate values
+	print('>> Before drop duplicate values: ')
+	print(f'>> nyc_df shape: {nyc_df.shape}')
+	print(nyc_df.info())
+	print(nyc_df.describe())
+	print('>> After drop duplicate values:')
+	print(f'>> nyc_df shape: {nyc_df.shape}')
+	print(nyc_df.info())
+	print(nyc_df.describe())
 	print('>> Before drop missing values:')
 	print(f'>> nyc_df shape: {nyc_df.shape}')
 	print(nyc_df.info())
+	
 	print(nyc_df.head())
-	# % Missing values
+	# Missing values
 	missing_values = nyc_df.isnull().sum().sort_values()
 	percentage_missing_values = (missing_values/len(nyc_df))*100
 	missing_values = pd.concat([missing_values, percentage_missing_values], axis = 1, keys= ['Missing values', '% Missing'])
@@ -57,11 +65,11 @@ def main():
 	for col in categorical_features:
 		nyc_df[col] = label_enc.fit_transform(nyc_df[col])
     
-	f, ax = plt.subplots(ncols=3, nrows=4, figsize=(15, len(nyc_df.columns)/2))
-	for i, c in zip(ax.flatten(), nyc_df.columns):
+	fig, axes = plt.subplots(ncols=3, nrows=4, figsize=(15, len(nyc_df.columns)/2))
+	for i, c in zip(axes.flatten(), nyc_df.columns):
 		sns.boxplot(nyc_df[c], ax = i)
-	f.tight_layout()
-	plt.title('Before removing outliers')
+	fig.subplots_adjust(hspace=.5)
+	fig.suptitle('Before removing outliers', fontsize = 16)
 	plt.show()
 
 	# Detect outlier values
@@ -69,15 +77,15 @@ def main():
 	Q3 = nyc_df.quantile(0.75)
 	IQR = Q3 - Q1
 	print(IQR)
-	# remove outliers
+	# Remove outliers
 	nyc_df = nyc_df[~((nyc_df < (Q1 - 1.5 * IQR)) | (nyc_df > (Q3 + 1.5 * IQR))).any(axis=1)]
 	print(f'>> nyc_df shape after removing outliers: {nyc_df.shape}')
 
-	f, ax = plt.subplots(ncols = 3, nrows = 4, figsize=(15,len(nyc_df.columns)/2))
-	for i, c in zip(ax.flatten(), nyc_df.columns):
+	fig, axes = plt.subplots(ncols = 3, nrows = 4, figsize = (15,len(nyc_df.columns)/2))
+	for i, c in zip(axes.flatten(), nyc_df.columns):
 		sns.boxplot(nyc_df[c], ax = i)
-	f.tight_layout()
-	plt.title('After removing outliers')
+	fig.subplots_adjust(hspace=.5)
+	fig.suptitle('After removing outliers', fontsize = 16)
 	plt.show()
 
 	X = nyc_df.drop(['price'], axis=1)
@@ -135,5 +143,23 @@ def main():
 	print(f'R2 Score using Normalizer: {R2}')
 	print(f'Mean Absolute Error using Normalizer: {MAE}')
 	print(f'Mean Squareroot Error using Normalizer: {MSRE}')
+	'''
+	With random_state == 1:
+		Mean Squared Error using Standard Scaler: 49.246496857803805
+		R2 Score using Standard Scaler: 47.08939720751063
+		Mean Absolute Error using Standard Scaler: 36.81807466190845
+		Mean Squareroot Error using Standard Scaler: 2425.2174527656803
+
+		Mean Squared Error using Robust Scaler: 86.38395049787574
+		R2 Score using Robust Scaler: -62.801404373231804
+		Mean Absolute Error using Robust Scaler: 72.03624303878996
+		Mean Squareroot Error using Robust Scaler: 7462.186903619447
+
+		Mean Squared Error using Normalizer: 68.41117331653514
+		R2 Score using Normalizer: -2.1047867248628727
+		Mean Absolute Error using Normalizer: 55.1159828976059
+		Mean Squareroot Error using Normalizer: 4680.08863454501
+
+	'''
 if __name__ == '__main__':
 	main()
