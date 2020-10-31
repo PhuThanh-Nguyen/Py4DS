@@ -17,22 +17,27 @@ def main():
 	data = pd.read_csv('../dataset/creditcard.csv')
 	
 	# EDA
-	
 	for i in range(len(data.columns)):
 		print(data.iloc[:,i].value_counts())
 		print("*"*20)
+	'''
+		Nhận xét: Hệ số tương quan giữa các biến không lớn nên ta không bỏ cột
+	'''
 	plt.figure(figsize=(14,12))
 	sns.heatmap(data.corr(), linewidths=.1, cmap="YlGnBu", annot = False)
 	plt.yticks(rotation=0)
 	plt.show()
 	
+	plt.figure(figsize=(14,12))
 	sns.countplot(x="Class", data=data, linewidth=2, edgecolor=sns.color_palette("dark"))
 	plt.show()
 	
 	avg_amount = data.groupby("Class")[['Amount']].agg("mean").reset_index()
+	plt.figure(figsize=(14,12))
 	sns.barplot(x='Class', y= "Amount", data = avg_amount)
 	plt.show()
     
+	plt.figure(figsize=(14,12))
 	Amount = sns.boxplot(x="Class", y="Amount", data=data)
 	Amount.set(ylim=(data['Amount'].min(),300))
 	plt.show()
