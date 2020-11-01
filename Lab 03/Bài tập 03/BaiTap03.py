@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 
 def rfModel(X_train, X_test, y_train, y_test):
-	clf = RandomForestClassifier(random_state=1)
+	clf = RandomForestClassifier(random_state=100)
 	clf = clf.fit(X_train, y_train)
 	y_pred = clf.predict(X_test)
 	return metrics.accuracy_score(y_test, y_pred)
@@ -107,7 +107,7 @@ def main():
     scalerX = RobustScaler()
     scalerX.fit(X_train)
     X_train_standardScaler = scalerX.transform(X_train)
-	
+    
     scalerX.fit(X_test)
     X_test_standardScaler = scalerX.transform(X_test)
 	
@@ -125,10 +125,11 @@ def main():
     accuracy = rfModel(X_train_standardScaler, X_test_standardScaler, y_train, y_test)
     print(f'>> Random Forest model accuracy using Normalizer: {accuracy}')
     """
-    Random Forest Accuracy before normalizing 0.6842105263157895
-    Random Forest model accuracy using Standard Scaler: 0.7894736842105263
-    Random Forest model accuracy using Robust Scaler: 0.6842105263157895
-    Random Forest model accuracy using Normalizer: 0.7894736842105263
+    With random_state=100,
+    Random Forest Accuracy before normalizing 0.7368421052631579
+    Random Forest model accuracy using Standard Scaler: 0.7368421052631579
+    Random Forest model accuracy using Robust Scaler: 0.7894736842105263
+    Random Forest model accuracy using Normalizer: 0.8421052631578947
     """
 if __name__ == "__main__":
     main()
