@@ -21,7 +21,7 @@ def LinearRegression_Model(X_train,X_test,y_train,y_test):
 	)
 
 def main():
-	nyc_df = pd.read_csv('/home/duc-hoang/Documents/Junior-Year/Py4DS/LAB/Lab 03/dataset/AB_NYC_2019.csv')
+	nyc_df = pd.read_csv('../dataset/AB_NYC_2019.csv')
 	
 	# Drop duplicate values
 	print('>> Before drop duplicate values: ')
