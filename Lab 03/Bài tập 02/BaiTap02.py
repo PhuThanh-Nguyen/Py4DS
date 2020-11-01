@@ -119,12 +119,12 @@ def main():
 	# Using Robust Scaler
 	scalerX = RobustScaler()
 	scalerX.fit(X_train)
-	X_train_standardScaler = scalerX.transform(X_train)
+	X_train_RobustScaler = scalerX.transform(X_train)
 
 	scalerX.fit(X_test)
-	X_test_standardScaler = scalerX.transform(X_test)
+	X_test_RobustScaler = scalerX.transform(X_test)
 
-	MSE,R2,MAE,MSRE = LinearRegression_Model(X_train_standardScaler,X_test_standardScaler,y_train,y_test)
+	MSE,R2,MAE,MSRE = LinearRegression_Model(X_train_RobustScaler,X_test_RobustScaler,y_train,y_test)
 	print(f'\nMean Squared Error using Robust Scaler: {MSE}')
 	print(f'R2 Score using Robust Scaler: {R2}')
 	print(f'Mean Absolute Error using Robust Scaler: {MAE}')
@@ -133,12 +133,12 @@ def main():
 	# Using Normalizer
 	scalerX = Normalizer()
 	scalerX.fit(X_train)
-	X_train_standardScaler = scalerX.transform(X_train)
+	X_train_NormalizeScaler = scalerX.transform(X_train)
 
 	scalerX.fit(X_test)
-	X_test_standardScaler = scalerX.transform(X_test)
+	X_test_NormalizeScaler = scalerX.transform(X_test)
 
-	MSE,R2,MAE,MSRE = LinearRegression_Model(X_train_standardScaler,X_test_standardScaler,y_train,y_test)
+	MSE,R2,MAE,MSRE = LinearRegression_Model(X_train_NormalizeScaler,X_test_NormalizeScaler,y_train,y_test)
 	print(f'\nMean Squared Error using Normalizer: {MSE}')
 	print(f'R2 Score using Normalizer: {R2}')
 	print(f'Mean Absolute Error using Normalizer: {MAE}')
