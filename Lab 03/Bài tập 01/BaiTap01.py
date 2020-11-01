@@ -15,7 +15,6 @@ def decisionTreeModel(X_train, X_test, y_train, y_test):
 def main():
 	# Read data
 	data = pd.read_csv('../dataset/creditcard.csv')
-	
 	# EDA
 	for i in range(len(data.columns)):
 		print(data.iloc[:,i].value_counts())
@@ -42,7 +41,7 @@ def main():
 	Amount.set(ylim=(data['Amount'].min(),300))
 	plt.show()
 	
-	# Remove missing values, duplicates and outliers
+	# Remove missing values, duplicates
 	# Remove missing values:
 	print('>> Before drop missing values: ')
 	print(f'>> Data shape: {data.shape}')
@@ -63,23 +62,6 @@ def main():
 	
 	data.drop_duplicates(subset = data.columns.values[:-1], keep = 'first', inplace = True)
 	print('>> After drop duplicate values:')
-	print(f'>> Data shape: {data.shape}')
-	print(data.info())
-	print(data.describe())
-	
-	# Remove outliers
-	Q1 = data.quantile(0.25)
-	Q3 = data.quantile(0.75)
-	IQR = Q3 - Q1
-	
-	print('>> Before drop outliers: ')
-	print(f'>> Data shape: {data.shape}')
-	print(data.info())
-	print(data.describe())
-	
-	data = data[~((data < (Q1 - 1.5 * IQR)) |(data > (Q3 + 1.5 * IQR))).any(axis=1)]
-	
-	print('>> After drop outliers: ')
 	print(f'>> Data shape: {data.shape}')
 	print(data.info())
 	print(data.describe())
@@ -127,10 +109,10 @@ def main():
 	print(f'Decision Tree model accuracy using Normalizer: {accuracy}')
 	'''
 	With random_state == 1:
-		Decision Tree model accuracy before normalization: 1.0
-		Decision Tree model accuracy using Standard Scaler: 1.0
-		Decision Tree model accuracy using Robust Scaler: 1.0
-		Decision Tree model accuracy using Normalizer: 1.0
+		Decision Tree model accuracy before normalization: 0.9990131393447246
+		Decision Tree model accuracy using Standard Scaler: 0.9991964134664185
+		Decision Tree model accuracy using Robust Scaler: 0.9990695313821688
+		Decision Tree model accuracy using Normalizer: 0.9986042970732533
 	'''
 if __name__ == '__main__':
 	main()
