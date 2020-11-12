@@ -1,6 +1,7 @@
 '''
 	Python for Data Science: Laboratory 04 - Excercise 03
-	Perform an Exploratory Data Analysis (EDA), Data cleaning, Building clustering models for prediction, Presenting results using 		   dataset `mushrooms.csv`
+	Perform an Exploratory Data Analysis (EDA), Data cleaning, Building clustering models for prediction, 
+	Presenting results using dataset `mushrooms.csv`
 '''
 import pandas as pd
 import numpy as np
