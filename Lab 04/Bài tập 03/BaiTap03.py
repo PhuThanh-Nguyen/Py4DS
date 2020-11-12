@@ -47,7 +47,7 @@ def agglomerativeClustering(n_clusters, X_train, X_test, y_test):
 		Returns:
 			Accuracy of Agglomerative Clustering algorithm
 	'''
-	cluster = AgglomerativeClustering(n_clusters = n_clusters, affinity = 'l1', linkage = 'average').fit(X_train)
+	cluster = AgglomerativeClustering(n_clusters = n_clusters, linkage = 'single', affinity = 'euclidean').fit(X_train)
 	y_pred = cluster.fit_predict(X_test)
 	return metrics.accuracy_score(y_test, y_pred)
 
@@ -82,15 +82,18 @@ def main():
 	for column in data.columns:
 		print(column, data[column].nunique())
 	
-	# Encode the categorical features
-	label_encoder = LabelEncoder()
-	for column in data.columns:
-		data[column] = label_encoder.fit_transform(data[column])
-	
 	# Preprocessing
 	
 	# Drop columns via analysis in EDA:
 	data.drop('veil-type', axis = 'columns', inplace = True)
+	
+	# Drop missing values via description of dataset:
+	data = data.loc[data['stalk-root'] != '?'] 
+	
+	# Encode the categorical features
+	label_encoder = LabelEncoder()
+	for column in data.columns:
+		data[column] = label_encoder.fit_transform(data[column])
 	
 	# Drop missing values:
 	print('>> Data before drop missing values: ')
@@ -125,7 +128,7 @@ def main():
 	# Prepare data for training and testing
 	X = data.drop('class', axis = 1)
 	y = data['class']
-	random_state = 341
+	random_state = 843
 	
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = random_state)
 	number_clusters = 2
@@ -143,10 +146,10 @@ def main():
 	print(f'Accuracy using BIRCH Clustering: {accuracy}')
 	
 	'''
-	With random_state == 341:
-		Accuracy using KMeans Clustering: 0.8759398496240601
-		Accuracy using Agglomerative Clustering: 0.9022556390977443
-		Accuracy using BIRCH Clustering: 0.8157894736842105
+	With random_state == 843:
+		Accuracy using KMeans Clustering: 0.9547511312217195
+		Accuracy using Agglomerative Clustering: 0.9909502262443439
+		Accuracy using BIRCH Clustering: 0.9457013574660633
 	'''
 
 if __name__ == '__main__':
