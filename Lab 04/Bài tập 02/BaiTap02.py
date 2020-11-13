@@ -1,4 +1,8 @@
-# Add code here...
+'''
+    Python for Data Science: Laboratory 04 - Excercise 02
+    Perform an Exploratory Data Analysis (EDA), Data cleaning, 
+        Building clustering models for prediction, Presenting results using dataset 'diabetes.csv'
+'''
 import pandas as pd 
 import seaborn as sns
 import matplotlib.pyplot as plt 
@@ -6,7 +10,7 @@ from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.cluster import KMeans, AgglomerativeClustering, Birch, MiniBatchKMeans
 from sklearn.preprocessing import StandardScaler, Normalizer, RobustScaler
-def kMeanCluster(n_clusters, X_train, X_test, y_test, random_num):
+def kMeansClustering(n_clusters, X_train, X_test, y_test, random_num):
     '''
     Performs KMeans clustering using sklearn library
     Parameters:
@@ -41,6 +45,21 @@ def agglomerativeClustering(n_clusters, X_train, X_test, y_test):
     return metrics.accuracy_score(y_test, y_pred)
 
 def miniBatchKmeansClustering(n_clusters, random_num, X_train, X_test, y_test):
+    '''
+    Performs MiniBatchKmeansClustering using sklearn library
+    Parameters:
+            n_clusters: int
+                The number of clusters to form as well as the number of centroids to generate
+            random_num: int
+                Determines random number generation for centroid initialization and random reassignment. 
+                Use an int to make the randomness deterministic
+            X_train: array-like
+                Training instances to cluster
+            X_test: array-like
+                New (unseen) data to predict
+            y_test: array-like
+                Ground truth for X_test
+    '''
     cluster = MiniBatchKMeans(n_clusters = n_clusters, random_state=random_num).fit(X_train)
     y_pred = cluster.predict(X_test)
     return metrics.accuracy_score(y_test, y_pred)
@@ -65,7 +84,7 @@ def BIRCHClustering(n_clusters, X_train, X_test, y_test):
 def main():
     # Read data
     ######################## EDA #################################
-    path = '/home/duc-hoang/Documents/Junior-Year/Py4DS/LAB/Lab 04/dataset/diabetes.csv'
+    path = '../dataset/diabetes.csv'
     data = pd.read_csv(path)
 
     # Show original data info
@@ -85,7 +104,8 @@ def main():
     # Checking for duplicate values
     print('#'*50 + ' CHECKING DUPLICATE VALUES ' + '#'*50)
     duplicateRowsDF = data[data.duplicated()]
-    print("Duplicate Rows except first occurrence based on all columns are :")
+    total_duplicates = len(duplicateRowsDF)
+    print(f"Duplicate Rows (total: {total_duplicates}) except first occurrence based on all columns are :")
     print(duplicateRowsDF)
 
     ########################## PREPROCESSING ###############################
@@ -143,7 +163,7 @@ def main():
 
     ###################################### BUILD MODEL ###########################
     # Using K-Mean clustering
-    accuracy = kMeanCluster(number_clusters, X_train_RobustScaler, X_test_RobustScaler, y_test, randomstate)
+    accuracy = kMeansClustering(number_clusters, X_train_RobustScaler, X_test_RobustScaler, y_test, randomstate)
     print(f'Accuracy using KMeans Clustering: {accuracy}')
 
     # Using Agglomerative Clustering 
