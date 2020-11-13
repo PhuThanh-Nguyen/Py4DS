@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans, AgglomerativeClustering, Birch
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import Normalizer
 import warnings
 warnings.filterwarnings('ignore')
 def kMeansClustering(n_clusters, random_num, X_train, X_test, y_test):
@@ -173,9 +173,9 @@ def main():
 
     '''
     With random_state == 0 and number of clusters == 2:
-        Accuracy using KMeans Clustering: 0.896551724137931
+        Accuracy using KMeans Clustering: 0.8620689655172413
         Accuracy using Agglomerative Clustering: 0.896551724137931
-        Accuracy using BIRCH Clustering: 0.896551724137931
+        Accuracy using BIRCH Clustering: 0.9310344827586207
     '''
 if __name__ == "__main__":
     main()
