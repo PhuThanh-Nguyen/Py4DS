@@ -9,7 +9,9 @@ import matplotlib.pyplot as plt
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.cluster import KMeans, AgglomerativeClustering, Birch, MiniBatchKMeans
-from sklearn.preprocessing import StandardScaler, Normalizer, RobustScaler
+from sklearn.preprocessing import RobustScaler
+import warnings
+warnings.filterwarnings('ignore')
 def kMeansClustering(n_clusters, X_train, X_test, y_test, random_num):
     '''
     Performs KMeans clustering using sklearn library
