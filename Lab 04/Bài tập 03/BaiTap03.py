@@ -75,6 +75,7 @@ def BIRCHClustering(n_clusters, X_train, X_test, y_test):
 def main():
 	# Read data
 	data = pd.read_csv('../dataset/mushrooms.csv')
+	
 	# EDA
 	'''
 		Nhận xét:
@@ -82,19 +83,33 @@ def main():
 	'''
 	for column in data.columns:
 		print(column, data[column].nunique())
+	'''
+		Nhận xét:
+			Đồ thị cho thấy dữ liệu không mất cân bằng giữa hai lớp
+	'''
+	fig = plt.figure(figsize = (10,8))
+	sns.countplot(x = 'class', data = data, linewidth = 2, edgecolor=sns.color_palette("dark"))
+	fig.savefig('Countplot-class.png')
 	
+	'''
+		Nhận xét:
+			Đồ thị cho thấy loại nấm ăn được nằm chủ yếu khi cap-shape == `x`, `b`, `s`
+	'''
+	fig = plt.figure(figsize = (10,8))
+	sns.countplot(x = 'cap-shape', hue = 'class', data = data)
+	fig.savefig('Countplot-cap-shape.png')
 	# Preprocessing
 	
-	# Drop columns via analysis in EDA:
-	data.drop('veil-type', axis = 'columns', inplace = True)
-	
 	# Drop missing values via description of dataset:
-	data = data.loc[data['stalk-root'] != '?'] 
+	data = data.loc[data['stalk-root'] != '?']
 	
 	# Encode the categorical features
 	label_encoder = LabelEncoder()
 	for column in data.columns:
 		data[column] = label_encoder.fit_transform(data[column])
+	
+	# Drop columns via analysis in EDA:
+	data.drop('veil-type', axis = 'columns', inplace = True)
 	
 	# Drop missing values:
 	print('>> Data before drop missing values: ')
@@ -137,7 +152,7 @@ def main():
 	# Using Kmeans clustering
 	accuracy = kMeansModel(number_clusters, X_train, X_test, y_test, random_state)
 	print(f'Accuracy using KMeans Clustering: {accuracy}')
-
+	
 	# Using Agglomerative Clustering
 	accuracy = agglomerativeClustering(number_clusters, X_train, X_test, y_test)
 	print(f'Accuracy using Agglomerative Clustering: {accuracy}')
