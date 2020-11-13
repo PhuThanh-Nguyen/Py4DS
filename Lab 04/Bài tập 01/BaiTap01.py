@@ -9,8 +9,10 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans, AgglomerativeClustering, Birch
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-
-def kMeanCluster(n_clusters, X_train, X_test, y_test, random_num):
+from sklearn.preprocessing import RobustScaler
+import warnings
+warnings.filterwarnings('ignore')
+def kMeansClustering(n_clusters, random_num, X_train, X_test, y_test):
     '''
     Performs KMeans clustering using sklearn library
     Parameters:
@@ -45,55 +47,78 @@ def agglomerativeClustering(n_clusters, X_train, X_test, y_test):
     return metrics.accuracy_score(y_test, y_pred)
 
 def BIRCHClustering(n_clusters, X_train, X_test, y_test):
+    '''
+    Performs BirchClustering using sklearn library
+    Parameters:
+            n_clusters: int
+                Number of clusters after the final clustering step, which treats the subclusters from the leaves as new samples
+            X_train: array-like
+                Training instances to cluster
+            X_test: array-like
+                New (unseen) data to predict
+            y_test: array-like
+                Ground truth for X_test 
+    '''
     cluster = Birch(n_clusters = n_clusters)
     cluster.fit(X_train)
     y_pred = cluster.predict(X_test)
     return metrics.accuracy_score(y_test, y_pred)
 def main():
+    #################################### EDA ##################################
     # Read data
     path = '../dataset/spam_original.csv'
     data = pd.read_csv(path)
 
     # Show original data info
-    print('>>>>>> ORIGINAL DATA: ')
-    print(data.head())
-    print(f'>>>>>> DATA SHAPE: {data.shape}')
-    print('>>>>>> DATA INFO:')
+    print('#'*50 + ' ORIGINAL DATA INFOMATION ' + '#'*50)
+    print('>'*20 + f' Data shape: {data.shape} ')
+    print('>'*20 + ' Data info')
     print(data.info())
+    print(data.describe())
 
     # Detect missing values
     percent_missing = data.isnull().sum() * 100 / len(data)
     missing_value_df = pd.DataFrame({'column_name': data.columns,'percent_missing': percent_missing})
-    print('>>>>>> MISSING VALUES PERCENTAGE: ')
+    print('#'*50 + f' MISSING VALUE PERCENTAGE ' + '#'*50)
     print(missing_value_df)
 
     # Remove space char in column names:
     data.columns = data.columns.str.replace(' ','')
 
-    # Drop duplicate values
-    print('>>>>>> DATA BEFORE DROP DUPLICATE VALUES: ')
-    print(f'>>>>>> DATA SHAPE: {data.shape}')
-    print('>>>>>>> DATA INFO:')
+    # Checking and droping duplicate values
+    print('#'*50 + ' CHECKING DUPLICATE VALUES ' + '#'*50)
+    duplicateRowsDF = data[data.duplicated()]
+    total_duplicates = len(duplicateRowsDF)
+    print(f'Duplicate Rows (total: {total_duplicates}) except first occurrence based on all columns are :')
+    print(duplicateRowsDF)
+
+    print('#'*50 + ' DATA BEFORE DROPING DUPLICATE VALUES ' + '#'*50)
+    print('>'*20 + f' Data shape: {data.shape} ')
+    print('>'*20 + ' Data info')
     print(data.info())
     print(data.describe())
+
     data.drop_duplicates(subset = data.columns.values[:-1], keep='first', inplace=True)
-    print('>>>>>> DATA AFTER DROP DUPLICATE VALUES: ')
-    print(f'>>>>>> DATA SHAPE: {data.shape}')
-    print('>>>>>>> DATA INFO:')
+    print('#'*50 + ' DATA AFTER DROPING DUPLICATE VALUES ' + '#'*50)
+    print('>'*20 + f' Data shape: {data.shape} ')
+    print('>'*20 + ' Data info')
     print(data.info())
     print(data.describe())
     
+    ################################# PREPROCESSING #############################
     # Detect and drop outliers
-    print('>>>>>> DATA BEFORE REMOVING OUTLIERS')
-    print(f'>>>>>> DATA SHAPE: {data.shape}')
-    print('>>>>>> DATA INFO')
+    print('#'*50 + ' DATA BEFORE REMOVING OUTLIERS ' + '#'*50)
+    print('>'*20 + f' Data shape: {data.shape}')
+    print('>'*20 + ' Data info')
     print(data.info())
     print(data.describe())
-    
-    fig, axes = plt.subplots(ncols=9, nrows=7, figsize=(15, len(data.columns)/2))
+
+    # Plot data before removing outliers
+    fig, axes = plt.subplots(ncols=9, nrows=7, figsize=(20, len(data.columns)/4))
     for i, c in zip(axes.flatten(), data.columns):
         sns.boxplot(data[c], ax = i)
-    fig.subplots_adjust(hspace=.5)
+    fig.subplots_adjust(hspace=.7)
+    fig.subplots_adjust(wspace=1.2)
     fig.suptitle('Before removing outliers', fontsize = 16)
     plt.savefig('Before_remove_outliers.png')
 
@@ -102,40 +127,48 @@ def main():
     IQR = Q3 - Q1
     data = data[~((data < (Q1 - 1.5 * IQR)) | (data > (Q3 + 1.5 * IQR))).any(axis=1)]
 
-    fig, axes = plt.subplots(ncols=9, nrows=7, figsize=(15, len(data.columns)/2))
+    # Plot data after removing outliers
+    fig, axes = plt.subplots(ncols=9, nrows=7, figsize=(20, len(data.columns)/4))
     for i, c in zip(axes.flatten(), data.columns):
         sns.boxplot(data[c], ax = i)
-    fig.subplots_adjust(hspace=.5)
+    fig.subplots_adjust(hspace=.7)
+    fig.subplots_adjust(wspace=1.2)
     fig.suptitle('After removing outliers', fontsize = 16)
     plt.savefig('After_remove_outliers.png')
 
-    print('>>>>>> DATA AFTER REMOVING OUTLIERS')
-    print(f'>>>>>> DATA SHAPE: {data.shape}')
-    print('>>>>>> DATA INFO')
+    print('#'*50 + ' DATA AFTER REMOVING OUTLIERS ' + '#'*50)
+    print('>'*20 + f' Data shape: {data.shape}')
+    print('>'*20 + ' Data info')
     print(data.info())
     print(data.describe())
     
     # Prepare data for model
     X = data.drop('spam',axis=1)
     y = data['spam']
-    
+
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 1)
+    
+    # Using Robust Scaler
+    scalerX = Normalizer()
+    X_train_RobustScaler = scalerX.fit_transform(X_train)
+    X_test_RobustScaler = scalerX.transform(X_test)
 
     # Choose parameters for training model 
-    randomstate = 0
+    randomstate = 10
     number_clusters = 2
 
+    ################################ BUILD MODEL ##################################
     # Using K-Mean clustering
-    accuracy = kMeanCluster(number_clusters, X_train, X_test, y_test, randomstate)
+    accuracy = kMeansClustering(number_clusters, randomstate, X_train_RobustScaler, X_test_RobustScaler, y_test)
     print(f'Accuracy using KMeans Clustering: {accuracy}')
 
     # Using Agglomerative Clustering 
-    accuracy = agglomerativeClustering(number_clusters, X_train, X_test, y_test)
+    accuracy = agglomerativeClustering(number_clusters, X_train_RobustScaler, X_test_RobustScaler, y_test)
     print(f'Accuracy using Agglomerative Clustering: {accuracy}')
     
     # Using BIRCH Clustering
-    accuracy = BIRCHClustering(number_clusters, X_train, X_test, y_test)
+    accuracy = BIRCHClustering(number_clusters, X_train_RobustScaler, X_test_RobustScaler, y_test)
     print(f'Accuracy using BIRCH Clustering: {accuracy}')
 
     '''
