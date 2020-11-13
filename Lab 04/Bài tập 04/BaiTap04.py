@@ -32,7 +32,7 @@ def kMeansModel(n_clusters, X_train, X_test, y_test, random_num):
 	y_pred = kmeans.predict(X_test)
 	return metrics.accuracy_score(y_test, y_pred)
 
-def agglomerativeClustering(n_clusters, X_train, X_test, y_test, **kwargs):
+def agglomerativeClustering(n_clusters, X_train, X_test, y_test):
 	'''
 		Performs Agglomerative Clustering using sklearn library
 		Parameters:
@@ -63,6 +63,8 @@ def MiniBatchKMeansClustering(n_clusters, X_train, X_test, y_test, random_num):
 				New data to predict
 			y_test: array_like
 				Ground truth for X_test
+			random_num : int
+				Random state which will pass to KMeans to initialize centroids for each cluster 
 		Returns:
 			Accuracy of MiniBatch KMeans Clustering algorithm
 	'''
@@ -73,11 +75,56 @@ def MiniBatchKMeansClustering(n_clusters, X_train, X_test, y_test, random_num):
 
 def main():
 	# Read data
+	
 	data = pd.read_csv('../dataset/xAPI-Edu-Data.csv')
 	print(data.info())
-	data.rename(columns = {'NationalITy' : 'Nationality', 'VisITedResources' : 'VisitedResources'}, inplace = True)
+	data.rename(index = str,
+				columns={'gender':'Gender', 'NationalITy': 'Nationality',
+				'raisedhands': 'RaisedHands', 'VisITedResources': 'VisitedResources'}, 
+				inplace=True)
+	
 	# EDA
-	# Later...
+	
+	'''
+		Nhận xét: 
+			Nhận thấy số lượng dữ liệu 'M' chiếm hơn 60% nên 
+			dataset có xu hướng chệch nhiều sang 'M' (giới tính nam) hơn là 'F' (giới tính nữ)
+	'''
+	fig = plt.figure(figsize = (10,8))
+	ax = data['Gender'].value_counts(normalize = True).plot(kind = 'bar')
+	fig.savefig('Barplot-gender.png')
+	
+	'''
+	Nhận xét:
+		+) Phân vị thứ 3 của dữ liệu 'M' khoảng 60%, còn phân vị dữ liệu 'F' hơn 70%
+		--> Đa phần các nữ sinh tham gia bàn luận nhiều hơn so với các nam sinh
+		+) Boxplot của giới tính Nam có phân vị thứ 2 gần với phân vị thứ nhất -> Dữ liệu của nam sinh có thể lệch phải
+		+) Boxplot của giới tính Nữ có phân vị thứ 2 gần với phân vị thứ nhất, nhưng không quá nhiều -> Dữ liệu của nữ sinh khá đều
+	'''
+	fig = plt.figure(figsize = (10,8))
+	sns.boxplot(x = 'Gender', y = 'Discussion', data = data)
+	fig.savefig('Boxplot Gender vs Discussion.png')
+	
+	'''
+	Nhạn xét:
+		+) Biều đồ phân phối của nam lệch phải, đa đỉnh
+		+) Biều đồ phân phối của nữ  lệch phải nhưng không nhiều, đa đỉnh
+	'''
+	
+	FacetGrid = sns.FacetGrid(data, hue = 'Gender', height = 6)
+	FacetGrid.map(sns.kdeplot, 'Discussion', shade = True)
+	FacetGrid.set(xlim = (0, data['Discussion'].max()))
+	FacetGrid.add_legend()
+	FacetGrid.savefig('KDE plot Gender vs Discussion.png')
+	
+	'''
+	Nhận xét:
+		+) Đa số học sinh giỏi, trung bình nghỉ dưới 7 ngày
+		+) Đa số học sinh yếu và trung bình nghỉ trên 7 ngày, số lượng học sinh yếu nhiều hơn so với số lượng học sinh trung bình
+	'''
+	fig = plt.figure(figsize = (10,8))
+	sns.countplot(x = 'StudentAbsenceDays', hue = 'Class', data = data)
+	fig.savefig('Countplot: AbsenceDays - Class.png')
 	
 	# Preprocessing
 	
@@ -133,7 +180,7 @@ def main():
 	accuracy = agglomerativeClustering(number_clusters, X_train, X_test, y_test)
 	print(f'Accuracy using Agglomerative Clustering: {accuracy}')
 	
-	# Using BIRCH Clustering
+	# Using miniBatch Clustering
 	accuracy = MiniBatchKMeansClustering(number_clusters, X_train, X_test, y_test, random_state)
 	print(f'Accuracy using MiniBatch KMeans Clustering: {accuracy}')
 	
