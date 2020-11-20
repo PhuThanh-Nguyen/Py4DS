@@ -6,7 +6,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from sklearn.linear_model import RidgeClassifier
+from sklearn.linear_model import SGDClassifier
 from sklearn.neural_network import MLPClassifier
 
 def linearSVCModel(X_train, y_train, X_test, y_test):
@@ -14,8 +14,8 @@ def linearSVCModel(X_train, y_train, X_test, y_test):
 	y_pred = clf.predict(X_test)
 	return accuracy_score(y_test, y_pred)
 
-def ridgeClassifierModel(X_train, y_train, X_test, y_test):
-	clf = RidgeClassifier(random_state = 645).fit(X_train, y_train)
+def SGDClassifierModel(X_train, y_train, X_test, y_test):
+	clf = SGDClassifier(loss = 'log', learning_rate = 'constant', eta0 = 0.5, random_state = 645).fit(X_train, y_train)
 	y_pred = clf.predict(X_test)
 	return accuracy_score(y_test, y_pred)
 
@@ -237,8 +237,8 @@ def main():
 	accuracy = linearSVCModel(X_train, y_train, X_test, y_test)
 	print(f'>> Accuracy using Linear SVC: {accuracy}')
 	
-	accuracy = ridgeClassifierModel(X_train, y_train, X_test, y_test)
-	print(f'>> Accuracy using Ridge Classifier model: {accuracy}')
+	accuracy = SGDClassifierModel(X_train, y_train, X_test, y_test)
+	print(f'>> Accuracy using SGD Classifier model: {accuracy}')
 	
 	accuracy = MLPClassifierModel(X_train, y_train, X_test, y_test)
 	print(f'>> Accuracy using MLP classifier = {accuracy}')
@@ -246,8 +246,8 @@ def main():
 	'''
 	With random_state == 645:
 		Accuracy using Linear SVC: 0.7976190476190477
-		Accuracy using Ridge Classifier model: 0.6904761904761905
-		Accuracy using MLP classifier = 0.7619047619047619		
+		Accuracy using SGD Classifier model: 0.75
+		Accuracy using MLP classifier = 0.7619047619047619	
 	'''
 if __name__ == "__main__":
 	main()
