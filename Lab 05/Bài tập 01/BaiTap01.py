@@ -11,6 +11,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 
+
 def RandomForestModel(X_train, y_train, X_test, rd_num):
     '''
     Performs Random Forest model using sklearn library 
@@ -45,6 +46,7 @@ def DecisionTreeModel(X_train, y_train, X_test, rd_num):
     clf = DecisionTreeClassifier(random_state=rd_num).fit(X_train, y_train)
     y_pred = clf.predict(X_test)
     return clf.score(X_train, y_train)
+
 
 def main():
     ########################## Exploratory Data Analysis (EDA) ###############################
@@ -82,7 +84,7 @@ def main():
     print('#'*50 + f' MISSING VALUE PERCENTAGE OF DATA TRAIN' + '#'*50)
     percent_missing = data_train.isnull().sum() * 100 / len(data_train)
     missing_value_df_train = pd.DataFrame({'column_name': data_train.columns,
-                                        'percent_missing': percent_missing})
+                                           'percent_missing': percent_missing})
     print(missing_value_df_train)
     print('#'*50 + ' DATA TRAIN INFOMATION BEFORE HANDLING MISSING VALUES ' + '#'*50)
     print('>'*10 + f' Data shape: {data_train.shape}')
@@ -97,7 +99,7 @@ def main():
     print('#'*50 + f' MISSING VALUE PERCENTAGE OF DATA TEST' + '#'*50)
     percent_missing = data_test.isnull().sum() * 100 / len(data_test)
     missing_value_df_test = pd.DataFrame({'column_name': data_test.columns,
-                                        'percent_missing': percent_missing})
+                                          'percent_missing': percent_missing})
     print(missing_value_df_test)
     print('#'*50 + ' DATA TEST INFOMATION BEFORE HANDLING MISSING VALUES ' + '#'*50)
     print('>'*10 + f' Data test shape: {data_test.shape}')
@@ -170,7 +172,8 @@ def main():
     print(data_test.head())
 
     # Encode data_train and data_test
-    categorical_features = data_train.select_dtypes(include=[np.object]).columns
+    categorical_features = data_train.select_dtypes(
+        include=[np.object]).columns
     label_enc = LabelEncoder()
     for col in categorical_features:
         data_train[col] = label_enc.fit_transform(data_train[col])
@@ -211,7 +214,8 @@ def main():
     print(data_test.info())
 
     # Drop duplicate values on data train and data test
-    data_train.drop_duplicates(subset=data_train.columns.values[:-1], keep='first', inplace=True)
+    data_train.drop_duplicates(
+        subset=data_train.columns.values[:-1], keep='first', inplace=True)
     print('#'*50 + ' DATA TRAIN INFO AFTER DROPPING DUPLICATE VALUES ' + '#'*50)
     print('>'*10 + f' Data train shape: {data_train.shape}')
     print('>'*10 + ' Data train info:')
@@ -245,8 +249,7 @@ def main():
     Q1 = data_train.quantile(0.25)
     Q3 = data_train.quantile(0.75)
     IQR = Q3 - Q1
-    data_train = data_train[~((data_train < (Q1 - 1.5 * IQR))
-                                | (data_train > (Q3 + 1.5 * IQR))).any(axis=1)]
+    data_train = data_train[~((data_train < (Q1 - 1.5 * IQR)) | (data_train > (Q3 + 1.5 * IQR))).any(axis=1)]
 
     fig, axes = plt.subplots(
         ncols=2, nrows=4, figsize=(15, len(data_train.columns)))
@@ -263,21 +266,23 @@ def main():
     print(data_train.describe())
 
     # Prepare data for training model
-    X_train = data_train.drop('Survived',axis=1)
+    X_train = data_train.drop('Survived', axis=1)
     y_train = data_train['Survived']
     X_test = data_test
-    
-    # Build and train model
-    accuracy = RandomForestModel(X_train, y_train, X_test,645)
-    print(f'>> Accuracy using Linear SVC: {accuracy}')
 
-    accuracy = DecisionTreeModel(X_train, y_train, X_test,645)
-    print(f'>> Accuracy using SGD Classifier model: {accuracy}')
+    # Build and train model
+    accuracy = RandomForestModel(X_train, y_train, X_test, 645)
+    print(f'>> Accuracy using Random Forest Classifier model: {accuracy}')
+
+    accuracy = DecisionTreeModel(X_train, y_train, X_test, 645)
+    print(f'>> Accuracy using Decision Tree Classifier model: {accuracy}')
 
     '''
     With random_state == 645:
-        Accuracy using Linear SVC: 0.9855769230769231
-        Accuracy using SGD Classifier model: 0.9879807692307693	
+        Accuracy using Random Forest Classifier model: 0.9855769230769231
+        Accuracy using Decision Tree Classifier model: 0.9879807692307693	
     '''
+
+
 if __name__ == "__main__":
-	main()
+    main()
