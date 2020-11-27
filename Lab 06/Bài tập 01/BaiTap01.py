@@ -10,19 +10,20 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from sklearn.feature_selection import VarianceThreshold, mutual_info_classif, SelectKBest, chi2
+from sklearn.feature_selection import VarianceThreshold, mutual_info_classif, SelectKBest, chi2, SelectFromModel, RFE
 from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
 
 def ConstantFeatures(X_train, X_test, threshold = 0):
   '''
 	Removing Constant Features using Variance Threshold
-	
+	------------------
 	Parameters:
 		threshold: float, default = 0
 			threshold parameter to identify the variable as constant
 		X_train, X_test: DataFrame object
 			Training and testing data to evaluate 
-	
+	------------------
 	Returns: 
 		train data, test data after applying filter methods
   '''
@@ -56,11 +57,13 @@ def quasiConstantFeatures(X_train, X_test, thres = 0.98):
 	
 	'''
 		Perform Quasi-constant feature selection
+		------------------
 		Parameters:
 			X_train, X_test: DataFrame objects
 				Training and testing data
 			thres: float, between 0 and 1
 				threshold to drop feature
+		------------------
 		Returns:
 			X_train, X_test after applying Quasi - Constant feature selection
 	'''
@@ -86,9 +89,11 @@ def quasiConstantFeatures(X_train, X_test, thres = 0.98):
 def duplicateFeatures(X_train, X_test):
 	'''
 		Drop duplicated columns from traning, testing data
+		------------------
 		Parameters:
 			X_train, X_test: DataFrame objects
 				Training and testing data
+		------------------
 		Returns:
 			X_train, X_test after dropping duplicated columns
 	'''
@@ -106,11 +111,13 @@ def duplicateFeatures(X_train, X_test):
 def correlationFilterMethod(X_train, X_test, thres = 0.8):
 	'''
 		Perform Correlation filter method
+		------------------
 		Parameters:
 			X_train, X_test: DataFrame objects
 				Training and testing data
 			thres: float, default: 0.8
 				Threshold of absolute value of correlation, must between 0 and 1
+		------------------
 		Returns:
 			X_train, X_test after applying correlation filter method
 	'''
@@ -134,11 +141,13 @@ def mutualInfomation(numFeatures, X_train, y_train, X_test):
 
 	'''
 		Perform Mutual information filter method
+		------------------
 		Parameters:
 			numFeatures: int
 				Number of features to retain after filter
 			X_train, X_test, y_train: DataFrame/Series objects
 				Training data and testing data
+		------------------
 		Returns:
 			Training data and testing data after applying mutual information
 	'''
@@ -156,11 +165,13 @@ def mutualInfomation(numFeatures, X_train, y_train, X_test):
 def chiSquareMethod(numFeatures, X_train, y_train, X_test):
 	'''
 		Perform Chi-Square method
+		------------------
 		Parameters:
 			numFeatures: int
 				Number of features to retain after filter
 			X_train, X_test, y_train: DataFrame/Series objects
 				Training data and testing data
+		------------------
 		Returns:
 			Training data and testing data after applying chisquare method
 
@@ -171,23 +182,74 @@ def chiSquareMethod(numFeatures, X_train, y_train, X_test):
 	features = X_train.columns[selection.get_support()]
 	return X_train[features], X_test[features]
 
-def PCAMethod(num_components, X_train):
+def selectFromModel(mdl, X_train, y_train, X_test):
+	'''
+		Using Select From Model from sklearn.model_selection
+		------------------
+		Parameters:
+			mdl: object
+				The base estimator from which the transformer is built.
+				The estimator must have either a feature_importances_ or coef_ attribute after fitting
+			X_train, y_train, X_test: DataFrame/Series objects
+		------------------
+		Returns:
+			Training and testing data after using sklearn.model_selection.SelectFromModel method
+	'''
+	select_model = feature_selection.SelectFromModel(mdl)
+	fit = select_model.fit(X_train, y_train)
+	return fit.transform(X_train), fit.transform(X_test)
+	
+def PCAMethod(num_components, X_train, X_test):
+	'''
+		Perform Principle Component Analysis (PCA) Method
+		------------------
+		Parameters:
+			num_components:	int
+				Number of components to keep
+			X_train, X_test: DataFrame objects
+		------------------
+		Returns:
+			Training and testing data after applying PCA Method
+	'''
 	pca = PCA(n_components = num_components)
 	pca.fit(X_train)
-	X_train = pca.transform(X_train)
-	return X_train
+	return pca.transform(X_train), pca.transform(X_test)
+
+def RFE(mdl, n_features, X_train, X_test, y_train, y_test):
+	'''
+		Perform Recursive Feature Elimination (RFE) Method
+		------------------
+		Parameters:
+			mdl: object
+				A supervised learning estimator with a fit method that provides information about feature importance 
+				either through a coef_ attribute or through a feature_importances_ attribute
+			n_features:	int
+				The number of features to select
+			X_train, X_test, y_train, y_test: DataFrame/Series objects
+		------------------
+		Returns:
+			Training and testing data after applying RFE Method
+	'''
+	# Define model
+	rfe = RFE(estimator = mdl, n_features_to_select = n_features)
+	# Fit the model
+	rfe.fit(X_train, y_train)
+	# Transform the data
+	X_train, y_train = rfe.transform(X_train, y_train)
+	X_test, y_test = rfe.transform(X_test, y_test)
+	return X_train, X_test, y_train, y_test
 
 def BackwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 	
 	'''
 		Perform backward feature elimination
-		
+		------------------
 		Parameters:
 			X_train, y_train, X_test, y_test: DataFrame object
 				Training and testing data
 			clf: sklearn classification model
 				Model to train, test and calculate error
-		
+		------------------
 		Returns:
 			X_train, X_test after applying backward feature elimination algorithm
 	'''
@@ -195,9 +257,11 @@ def BackwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 	def errorCalculate(columns):
 		'''
 			A wrapper function to calculate error on training, testing data on given columns
+			------------------
 			Parameters:
 				columns: list-like
 					Set of columns to calculate error
+			------------------
 			Returns:
 				Error (1 - accuracy_score) when train model using such columns 
 		'''
@@ -228,11 +292,13 @@ def ForwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 	
 	'''
 		Perform forward feature elimination
+		------------------
 		Parameters:
 			X_train, y_train, X_test, y_test: Data frame
 				Training and testing data
 			clf: sklearn classification model
 				Model to train, test and calculate error
+		------------------
 		Returns:
 			X_train, X_test after applying forward feature elimination algorithm
 	'''
@@ -240,9 +306,11 @@ def ForwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 	def errorCalculate(columns):
 		'''
 			A wrapper function to calculate error on training, testing data on given columns
+			------------------
 			Parameters:
 				columns: list-like
 					Set of columns to calculate error
+			------------------
 			Returns:
 				Error (1 - accuracy_score) when train model using such columns 
 		'''
