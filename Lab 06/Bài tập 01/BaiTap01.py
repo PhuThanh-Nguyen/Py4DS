@@ -3,7 +3,7 @@
 	Lab 6: Feature Selection vs Dimensionality Reduction - Excercise 01
 	
 	1. Defining the functions correspond with the feature selection or dimensionality reduction
-technologies.
+	technologies.
 	2. Giving examples to demonstrate your function works
 '''
 import numpy as np
@@ -137,7 +137,7 @@ def correlationFilterMethod(X_train, X_test, thres = 0.8):
 	X_test = X_test.drop(labels = corr_features, axis = 1)
 	return X_train, X_test
 
-def mutualInfomation(numFeatures, X_train, y_train, X_test):
+def mutualInfomation(numFeatures, X_train, X_test, y_train, y_test):
 
 	'''
 		Perform Mutual information filter method
@@ -145,8 +145,8 @@ def mutualInfomation(numFeatures, X_train, y_train, X_test):
 		Parameters:
 			numFeatures: int
 				Number of features to retain after filter
-			X_train, X_test, y_train: DataFrame/Series objects
-				Training data and testing data
+			X_train, X_test, y_train, y_test: DataFrame/Series objects
+				Training data
 		------------------
 		Returns:
 			Training data and testing data after applying mutual information
@@ -154,15 +154,15 @@ def mutualInfomation(numFeatures, X_train, y_train, X_test):
 
 	# Get only the numerical features.
 	numerical_X_train = X_train[X_train.select_dtypes([np.number]).columns]
+	numerical_X_test = X_test[X_test.select_dtypes([np.number]).columns]
 
 	# Create the SelectKBest with the mutual info strategy.
-	selection = SelectKBest(mutual_info_classif, k = numFeatures).fit(numerical_x_train, y_train)
-
-	features = X_train.columns[selection.get_support()]
+	selection_XTrain = SelectKBest(mutual_info_classif, k = numFeatures).fit(numerical_X_train, y_train)
+	selection_XTest = SelectKBest(mutual_info_classif, k = numFeatures).fit(numerical_X_test, y_test)
 	
-	return X_train[features], X_test[features]
+	return selection_XTrain.transform(X_train), selection_XTest.transform(X_test)
 
-def chiSquareMethod(numFeatures, X_train, y_train, X_test):
+def chiSquareMethod(numFeatures, X_train, X_test, y_train, y_test):
 	'''
 		Perform Chi-Square method
 		------------------
@@ -177,10 +177,10 @@ def chiSquareMethod(numFeatures, X_train, y_train, X_test):
 
 	'''
 	# Apply the chi2 score on the data and target (target should be binary).  
-	selection = SelectKBest(chi2, k = numFeatures).fit(X_train, y_train)
+	selection_XTrain = SelectKBest(chi2, k = numFeatures).fit(X_train, y_train)
+	selection_XTest = SelectKBest(chi2, k = numFeatures).fit(X_test, y_test)
 
-	features = X_train.columns[selection.get_support()]
-	return X_train[features], X_test[features]
+	return selection_XTrain.transform(X_train), selection_XTest.transform(X_test)
 
 def selectFromModel(mdl, X_train, y_train, X_test):
 	'''
@@ -195,7 +195,7 @@ def selectFromModel(mdl, X_train, y_train, X_test):
 		Returns:
 			Training and testing data after using sklearn.model_selection.SelectFromModel method
 	'''
-	select_model = feature_selection.SelectFromModel(mdl)
+	select_model = SelectFromModel(mdl)
 	fit = select_model.fit(X_train, y_train)
 	return fit.transform(X_train), fit.transform(X_test)
 	
@@ -215,7 +215,7 @@ def PCAMethod(num_components, X_train, X_test):
 	pca.fit(X_train)
 	return pca.transform(X_train), pca.transform(X_test)
 
-def RFE(mdl, n_features, X_train, X_test, y_train, y_test):
+def RFEMethod(mdl, n_features, X_train, X_test, y_train, y_test):
 	'''
 		Perform Recursive Feature Elimination (RFE) Method
 		------------------
@@ -234,10 +234,7 @@ def RFE(mdl, n_features, X_train, X_test, y_train, y_test):
 	rfe = RFE(estimator = mdl, n_features_to_select = n_features)
 	# Fit the model
 	rfe.fit(X_train, y_train)
-	# Transform the data
-	X_train, y_train = rfe.transform(X_train, y_train)
-	X_test, y_test = rfe.transform(X_test, y_test)
-	return X_train, X_test, y_train, y_test
+	return rfe.transform(X_train), rfe.transform(X_test)
 
 def BackwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 	
@@ -274,7 +271,7 @@ def BackwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 		return 1 - accuracy_score(y_test, y_pred)
 	
 	min_err = errorCalculate(X_train.columns)
-	cols = X_train.columns
+	cols = list(X_train.columns)
 	
 	for column in X_train.columns:
 		temp = cols.copy()
@@ -285,8 +282,9 @@ def BackwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 		if err < min_err:
 			min_err = err
 		else:
-			return X_train[cols], X_test[col]
+			return X_train[cols], X_test[cols]
 		cols = temp
+	return X_train, X_test
 
 def ForwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 	
@@ -324,8 +322,9 @@ def ForwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 	
 	# Start with empty set of columns
 	min_err, cols, i = 0, [], 0
+	max_cols = list(X_train.columns)
 	
-	while cols != X_train.columns:
+	while cols != max_cols:
 		temp = cols.copy()
 		temp.append(X_train.columns[i])
 		err = errorCalculate(temp)
@@ -338,9 +337,10 @@ def ForwardFeatureElimination(X_train, y_train, X_test, y_test, clf):
 			return X_train[cols], X_test[cols]
 		i += 1
 		cols = temp
-	return X_train[cols], X_test[cols]
+	return X_train[max_cols], X_test[max_cols]
 
 def main():
+	rnd = np.random.RandomState(0)
 	# ------------------- Test Costant Features function -------------------
 	# Create dummy data to test
 	data = pd.DataFrame({'a' : [1,1,1,1], 'b' : [1,2,3,4], 'c' : [2,1,3,4], 'y' : [0,0,1,1]})
@@ -392,7 +392,6 @@ def main():
 	print(X_test_new)
 
 	# ------------------- Test correlationFilterMethod function -------------------
-	rnd = np.random.RandomState(0)
 	# Create dummy data to test
 	data = pd.DataFrame({'a' : rnd.randn(10), 'b' : rnd.randn(10),\
 						 'c' : rnd.randn(10), 'd' : rnd.randn(10),\
@@ -412,6 +411,181 @@ def main():
 	# X_train_new and X_test_new must drop column `e` and `f`
 	X_train_new, X_test_new = correlationFilterMethod(X_train, X_test, thres = 0.8)
 	print('>> After apply correlation filter method')
+	print('>> X_train:')
+	print(X_train_new)
+	print('>> X_test:')
+	print(X_test_new)
+
+	# ------------------- Test mutualInfomation function -------------------
+	# Create dummy data to test
+	data = pd.DataFrame({'a' : rnd.randn(10), 'b' : rnd.randn(10),\
+						 'c' : rnd.randn(10), 'd' : rnd.randn(10),\
+						 'y' : rnd.binomial(1, 0.4, size = 10)})
+	data['e'] = 2 * data['a'] + 1
+	data['f'] = data['b'] + 2 * data['a']
+	# Split data
+	X, y = data.drop('y', axis = 1), data['y']
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = rnd)
+
+	print('*' * 20)
+	print('>> Before apply mutual information filter method')
+	print('>> X_train:')
+	print(X_train)
+	print('>> X_test:')
+	print(X_test)
+	# Apply Mutual Information Method
+	X_train_new, X_test_new = mutualInfomation(4, X_train, X_test, y_train, y_test)
+	print('>> After apply mutual information filter method')
+	print('>> X_train:')
+	print(X_train_new)
+	print('>> X_test:')
+	print(X_test_new)
+
+	# ------------------- Test Chi Square function -------------------
+	# Create dummy data to test
+	data = pd.DataFrame({'a' : np.abs(rnd.randn(10)), 'b' : np.abs(rnd.randn(10)),\
+						 'c' : np.abs(rnd.randn(10)), 'd' : np.abs(rnd.randn(10)),\
+						 'y' : rnd.binomial(1, 0.4, size = 10)})
+	data['e'] = 2 * data['a'] + 1
+	data['f'] = data['b'] + 2 * data['a']
+	# Split data
+	X, y = data.drop('y', axis = 1), data['y']
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = rnd)
+
+	print('*' * 20)
+	print('>> Before apply Chi Square filter method')
+	print('>> X_train:')
+	print(X_train)
+	print('>> X_test:')
+	print(X_test)
+	# Apply Chi Square method
+	X_train_new, X_test_new = chiSquareMethod(4, X_train, X_test, y_train, y_test)
+	print('>> After apply Chi Square filter method')
+	print('>> X_train:')
+	print(X_train_new)
+	print('>> X_test:')
+	print(X_test_new)
+
+	# ------------------- Test selectFrommodel -------------------
+	# Create dummy data to test
+	data = pd.DataFrame({'a' : np.abs(rnd.randn(10)), 'b' : np.abs(rnd.randn(10)),\
+						 'c' : np.abs(rnd.randn(10)), 'd' : np.abs(rnd.randn(10)),\
+						 'y' : rnd.binomial(1, 0.4, size = 10)})
+	data['e'] = 2 * data['a'] + 1
+	data['f'] = data['b'] + 2 * data['a']
+	# Split data
+	X, y = data.drop('y', axis = 1), data['y']
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = rnd)
+
+	print('*' * 20)
+	print('>> Before apply Select From Model method')
+	print('>> X_train:')
+	print(X_train)
+	print('>> X_test:')
+	print(X_test)
+	# Apply Select From Model method
+	rfc = RandomForestClassifier(n_estimators = 100)
+	X_train_new, X_test_new = selectFromModel(rfc, X_train, y_train, X_test)
+	print('>> After apply Select From Model method')
+	print('>> X_train:')
+	print(X_train_new)
+	print('>> X_test:')
+	print(X_test_new)
+
+	# ------------------- Test PCA -------------------
+	data = pd.DataFrame({'a' : np.abs(rnd.randn(10)), 'b' : np.abs(rnd.randn(10)),\
+						 'c' : np.abs(rnd.randn(10)), 'd' : np.abs(rnd.randn(10)),\
+						 'y' : rnd.binomial(1, 0.4, size = 10)})
+	data['e'] = 2 * data['a'] + 1
+	data['f'] = data['b'] + 2 * data['a']
+	# Split data
+	X, y = data.drop('y', axis = 1), data['y']
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = rnd)
+
+	print('*' * 20)
+	print('>> Before apply PCA method')
+	print('>> X_train:')
+	print(X_train)
+	print('>> X_test:')
+	print(X_test)
+	# Apply PCA Method
+	X_train_new, X_test_new = PCAMethod(2, X_train, X_test)
+	print('>> After apply PCA method')
+	print('>> X_train:')
+	print(X_train_new)
+	print('>> X_test:')
+	print(X_test_new)
+
+	# ------------------- Test RFE -------------------
+	data = pd.DataFrame({'a' : np.abs(rnd.randn(10)), 'b' : np.abs(rnd.randn(10)),\
+						 'c' : np.abs(rnd.randn(10)), 'd' : np.abs(rnd.randn(10)),\
+						 'y' : rnd.binomial(1, 0.4, size = 10)})
+	data['e'] = 2 * data['a'] + 1
+	data['f'] = data['b'] + 2 * data['a']
+	# Split data
+	X, y = data.drop('y', axis = 1), data['y']
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = rnd)
+
+	print('*' * 20)
+	print('>> Before apply RFE method')
+	print('>> X_train:')
+	print(X_train)
+	print('>> X_test:')
+	print(X_test)
+	# Apply RFE Method
+	rfc = RandomForestClassifier(n_estimators = 100)
+	X_train_new, X_test_new = RFEMethod(rfc, 2, X_train, X_test, y_train, y_test)
+	print('>> After apply RFE method')
+	print('>> X_train:')
+	print(X_train_new)
+	print('>> X_test:')
+	print(X_test_new)
+
+	# ------------------- Test Backward Feature Elimination method -------------------
+	data = pd.DataFrame({'a' : np.abs(rnd.randn(10)), 'b' : np.abs(rnd.randn(10)),\
+						 'c' : np.abs(rnd.randn(10)), 'd' : np.abs(rnd.randn(10)),\
+						 'y' : rnd.binomial(1, 0.4, size = 10)})
+	data['e'] = 2 * data['a'] + 1
+	data['f'] = data['b'] + 2 * data['a']
+	# Split data
+	X, y = data.drop('y', axis = 1), data['y']
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = rnd)
+
+	print('*' * 20)
+	print('>> Before apply Backward Feature Elimination method')
+	print('>> X_train:')
+	print(X_train)
+	print('>> X_test:')
+	print(X_test)
+	# Apply Backward Feature Elimination Method
+	rfc = RandomForestClassifier(n_estimators = 100)
+	X_train_new, X_test_new = BackwardFeatureElimination(X_train, y_train, X_test, y_test, rfc)
+	print('>> After apply Backward Feature Elimination method')
+	print('>> X_train:')
+	print(X_train_new)
+	print('>> X_test:')
+	print(X_test_new)
+
+	# ------------------- Test Forward Feature Elimination method -------------------
+	data = pd.DataFrame({'a' : np.abs(rnd.randn(10)), 'b' : np.abs(rnd.randn(10)),\
+						 'c' : np.abs(rnd.randn(10)), 'd' : np.abs(rnd.randn(10)),\
+						 'y' : rnd.binomial(1, 0.4, size = 10)})
+	data['e'] = 2 * data['a'] + 1
+	data['f'] = data['b'] + 2 * data['a']
+	# Split data
+	X, y = data.drop('y', axis = 1), data['y']
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = rnd)
+
+	print('*' * 20)
+	print('>> Before apply Forward Feature Elimination method')
+	print('>> X_train:')
+	print(X_train)
+	print('>> X_test:')
+	print(X_test)
+	# Apply Forward Feature Elimination Method
+	rfc = RandomForestClassifier(n_estimators = 100)
+	X_train_new, X_test_new = ForwardFeatureElimination(X_train, y_train, X_test, y_test, rfc)
+	print('>> After apply Forward Feature Elimination method')
 	print('>> X_train:')
 	print(X_train_new)
 	print('>> X_test:')
