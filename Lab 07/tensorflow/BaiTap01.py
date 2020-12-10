@@ -1,3 +1,9 @@
+'''
+	Python for Data Science
+	Lab 7: Deep Learning
+	Using tensorflow library
+'''
+
 import numpy as np
 from matplotlib import pyplot as plt
 import seaborn as sns
